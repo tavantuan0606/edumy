@@ -1,0 +1,37 @@
+<% layout('/layouts/boilerplate')%>
+
+<h1 class="text-center">Edit Course</h1>
+        <div class="col-6 offset-3">
+            <form action="/courses/<%=course._id%>?_method=PUT" method="POST" novalidate class="validated-form" enctype="multipart/form-data">
+                <div class = "mb-3">
+                    <label class = "form-label" for="title">Title</label>
+                    <input class = "form-control" type="text" id="title" name="course[title]" value="<%=course.title%>" required>
+                    <div class="valid-feedback">
+                        Valid!
+                    </div>
+                </div>
+                <div class = "mb-3">
+                    <label class = "form-label" for="location">Location</label>
+                    <input class = "form-control" type="text" id="location" name="course[location]" value="<%=course.location%>" required>
+                    <div class="valid-feedback">
+                        Valid!
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="formFile" class="form-label">Add Image</label>
+                    <input class="form-control" type="file" id="formFile" name="image" multiple>
+                  </div>
+                <div class="mb-3">
+                    <label class = "form-label" for="description">Description</label>
+                    <textarea class = "form-control" type="text" id="description" name="course[description]" required><%=course.description%></textarea>
+                    <div class="valid-feedback">
+                        Valid!
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <button href="/courses" class = "btn btn-info">Update Course</button>
+                </div>  
+            </form>
+            <a href="/courses/<%= course._id%>">Back To Course</a>
+        </div>
+    </h1>

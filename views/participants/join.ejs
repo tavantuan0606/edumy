@@ -1,0 +1,66 @@
+<% layout('/layouts/boilerplate')%>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">User Information Form</h2>
+    <form action="/join" method="POST" class="validated-form" novalidate>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="col-md-6">
+                <label for="mobile_num" class="form-label">Mobile Number</label>
+                <input type="number" class="form-control" id="mobile_num" name="mobile_num" required>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="nationality" class="form-label">Nationality</label>
+                <input type="text" class="form-control" id="nationality" name="nationality" required>
+            </div>
+            <div class="col-md-6">
+                <label for="sex" class="form-label">Sex</label>
+                <select class="form-select" id="sex" name="sex" required>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="age" class="form-label">Age</label>
+                <input type="number" class="form-control" id="age" name="age" required>
+            </div>
+            <div class="col-md-6">
+                <label for="race_bib" class="form-label">Race Bib</label>
+                <input type="text" class="form-control" id="race_bib" name="race_bib" placeholder="e.g., Hanoi2024, 2024-03-18, 3:45:30, 1st" required>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="passport_no" class="form-label">Passport Number</label>
+                <input type="number" class="form-control" id="passport_no" name="passport_no" required>
+            </div>
+            <div class="col-md-6">
+                <label for="current_address" class="form-label">Current Address</label>
+                <input type="text" class="form-control" id="current_address" name="current_address" required>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="e_mail" class="form-label">Email</label>
+                <input type="email" class="form-control" id="e_mail" name="e_mail" required>
+            </div>
+            <div class="col-md-6">
+                <label for="hotel_name" class="form-label">Hotel Name</label>
+                <input type="text" class="form-control" id="hotel_name" name="hotel_name" required>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
