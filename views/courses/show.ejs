@@ -24,17 +24,32 @@
         <% } %>
       </div>
     </div>
+
     <div id="videoPlayerContainer" class="ratio ratio-16x9 mb-3" style="display: none;">
       <iframe id="videoIframe" src="" allow="autoplay" allowfullscreen></iframe>
     </div>
+
     <div class="card mb-3">
-      <div class="card-body">
+      <div class="card-body" id="videoNoteSection" style="display: none;">
+        <h5 class="card-title">Ghi chú buổi học</h5>
+        <% course.driveStructure.forEach((section, index) => { %>
+          <textarea class="form-control section-note"
+            id="note-section-<%= index %>"
+            rows="5"
+            placeholder="Nhập ghi chú cho Section <%= index + 1 %>..."
+            onblur="saveNote(<%= index %>)"
+            style="display:none;"><%= sectionNotes[index] || '' %></textarea>
+        <% }) %>
+      </div>
+
+      <div class="card-body" id="courseInfo">
         <h5 class="card-title"><%= course.title %></h5>
         <p class="card-text"><%= course.description %></p>
       </div>
-      <% if((currentUser && course.author.equals(currentUser._id)) || currentUser._id == '675da20f3dfdaa4f789ffa00') {%>
+
+      <% if ((currentUser && course.author.equals(currentUser._id)) || currentUser._id == '675da20f3dfdaa4f789ffa00') { %>
         <div class="card-body">
-          <a class="card-link btn btn-info" href="/courses/<%=course._id%>/edit">Edit</a>
+          <!-- <a class="card-link btn btn-info" href="/courses/<%=course._id%>/edit">Edit</a> -->
           <form class="d-inline" action="/courses/<%=course._id%>?_method=DELETE" method="POST">
             <button class="btn btn-danger">Delete</button>
           </form>
@@ -42,15 +57,18 @@
       <% } %>
     </div>
   </div>
+
   <div class="col-6">
     <% const totalVideos = course.driveStructure.reduce((acc, sec) => acc + sec.videos.length, 0); %>
     <% const completedCount = completedVideos.length; %>
     <div class="mb-2">
       <h6 class="text-success">Tiến độ học: <%= completedCount %> / <%= totalVideos %> video (<%= Math.round(completedCount / totalVideos * 100) %>%)</h6>
       <div class="progress">
-        <div class="progress-bar bg-success" role="progressbar" style="width: <%= Math.round(completedCount / totalVideos * 100) %>%" aria-valuenow="<%= completedCount %>" aria-valuemin="0" aria-valuemax="<%= totalVideos %>"></div>
+        <div class="progress-bar bg-success" role="progressbar" style="width: <%= Math.round(completedCount / totalVideos * 100) %>%"
+          aria-valuenow="<%= completedCount %>" aria-valuemin="0" aria-valuemax="<%= totalVideos %>"></div>
       </div>
     </div>
+
     <% if (course.driveStructure && course.driveStructure.length > 0) { %>
       <div class="mb-4">
         <h5>Sections</h5>
@@ -66,127 +84,13 @@
         </div>
       </div>
     <% } %>
-
-    <% if(currentUser) {%>
-      <h2>Leave a Review</h2>
-      <form action="/courses/<%=course._id%>/reviews" method="POST" class="mb-3 validated-form" novalidate>
-        <div class="mb-3">
-          <fieldset class="starability-basic">
-            <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
-            <input type="radio" id="first-rate1" name="review[rating]" value="1" />
-            <label for="first-rate1" title="Terrible">1 star</label>
-            <input type="radio" id="first-rate2" name="review[rating]" value="2" />
-            <label for="first-rate2" title="Not good">2 stars</label>
-            <input type="radio" id="first-rate3" name="review[rating]" value="3" />
-            <label for="first-rate3" title="Average">3 stars</label>
-            <input type="radio" id="first-rate4" name="review[rating]" value="4" />
-            <label for="first-rate4" title="Very good">4 stars</label>
-            <input type="radio" id="first-rate5" name="review[rating]" value="5" />
-            <label for="first-rate5" title="Amazing">5 stars</label>
-          </fieldset>
-        </div>
-        <div class="mb-3">
-          <label class="form-label" for="body">Review</label>
-          <textarea class="form-control" name="review[body]" id="body" cols="30" rows="3" required></textarea>
-        </div>
-        <button class="btn btn-success">Submit</button>
-      </form>
-    <% } %>
-
-    <% for(let review of course.reviews) {%>
-      <div class="card">
-        <div class="card-body">
-          <div class="mb-3">
-            <h5 class="card-title"><%= review.author.username %></h5>
-            <p class="starability-result" data-rating="<%= review.rating %>">Rated: <%= review.rating %> stars</p>
-            <p class="card-text">Review: <%= review.body %></p>
-            <% if(currentUser && review.author.equals(currentUser._id)) {%>
-              <form action="/courses/<%=course._id%>/reviews/<%=review._id%>?_method=DELETE" method="POST">
-                <button class="btn btn-sm btn-danger">Delete</button>
-              </form>
-            <% } %>
-          </div>
-        </div>
-      </div>
-    <% } %>
   </div>
 </div>
-<footer>
-  <a href="/courses">All Courses</a>
-</footer>
 
+<!-- Khai báo biến và load JS -->
 <script>
   const course = <%- JSON.stringify(course) %>;
   const completedVideos = <%- JSON.stringify(completedVideos) %>;
-  
-  function showVideos(sectionIndex) {
-  const section = course.driveStructure[sectionIndex];
-  const container = document.getElementById('videoListContainer');
-
-  if (!section || !section.videos || section.videos.length === 0) {
-    container.innerHTML = `<p class="text-warning">No videos found in this section.</p>`;
-    return;
-  }
-
-  let html = `<h6>Videos in ${section.section || 'Section ' + (sectionIndex + 1)}:</h6><ul class="list-group">`;
-
-  section.videos.forEach(video => {
-    const isChecked = completedVideos.some(v => v.split('?')[0] === video.preview.split('?')[0]) ? 'checked' : '';
-    console.log(`✅ Check match for: ${video.preview} =`, isChecked ? '✔️ YES' : '❌ NO');
-
-    html += `
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <div>
-          ${video.name}
-          <button class="btn btn-sm btn-outline-secondary ms-2" onclick="playVideo('${video.preview}')">Watch</button>
-        </div>
-        <div>
-          <input type="checkbox" onchange="toggleProgress('${video.preview}', this.checked)" ${isChecked}>
-          <label class="form-check-label ms-1">Đã học</label>
-        </div>
-      </li>`;
-  });
-
-  html += `</ul>`;
-  container.innerHTML = html;
-}
-
-
-  function playVideo(link) {
-    document.getElementById('imageContainer').style.display = 'none';
-    const player = document.getElementById('videoPlayerContainer');
-    const iframe = document.getElementById('videoIframe');
-    iframe.src = link;
-    player.style.display = 'block';
-  }
-
-  function toggleProgress(videoUrl, isCompleted) {
-    fetch(`/courses/${course._id}/progress`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        video: videoUrl,
-        completed: isCompleted
-      })
-    })
-    .then(async res => {
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`Lỗi ${res.status}: ${errorText}`);
-      }
-      return res.json();
-    })
-    .then(data => {
-      if (!data.success) {
-        console.warn('[Lỗi lưu tiến độ]', data.error);
-        alert('Không thể lưu tiến độ học. Vui lòng thử lại.');
-      }
-    })
-    .catch(err => {
-      console.error('[Lỗi JS khi cập nhật tiến độ]', err);
-      alert('Có lỗi xảy ra khi lưu tiến độ.');
-    });
-  }
+  const sectionNotes = <%- JSON.stringify(sectionNotes) %>;
 </script>
+<script src="/javascripts/show.js" defer></script>

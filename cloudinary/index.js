@@ -10,7 +10,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
     cloudinary,
     params: {
-        folder: 'MarathonImg',
+        folder: 'CourseImg',
         allowedFormats: ['jpeg', 'png', 'jpg']
     }
 });

@@ -8,6 +8,7 @@ const { storage } = require('../cloudinary/index');
 const upload = multer({ storage });
 const Progress = require('../models/progress');
 const mongoose = require('mongoose');
+const Note = require('../models/note');
 
 router.route('/')
     .get(catchAsync(courses.index))
@@ -64,6 +65,27 @@ router.post('/:courseId/progress', isLoggedIn, async (req, res) => {
 
   } catch (err) {
     console.error('[❌ Lỗi khi lưu progress]', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+router.post('/:courseId/notes', isLoggedIn, async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const { sectionIndex, content } = req.body;
+    const userId = req.user._id;
+
+    let note = await Note.findOne({ user: userId, course: courseId, sectionIndex });
+    if (!note) {
+      note = new Note({ user: userId, course: courseId, sectionIndex, content });
+    } else {
+      note.content = content;
+    }
+
+    await note.save();
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[Lỗi ghi chú]', err);
     res.status(500).json({ success: false, error: err.message });
   }
 });
