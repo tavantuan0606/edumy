@@ -7,7 +7,11 @@ const UserSchema = new Schema({
         type: String,
         require: true,
         unique: true
-    }
+    },
+    enrolledCourses: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Course'
+    }]
 })
 
 UserSchema.plugin(passportLocalMongoose);

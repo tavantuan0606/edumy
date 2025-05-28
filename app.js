@@ -16,6 +16,7 @@ const User = require('./models/user');
 const userRoutes = require('./routes/users');
 const courseRoutes = require('./routes/courses');
 const reviewRoutes = require('./routes/reviews');
+const exploreRoutes = require('./routes/explore');
 
 mongoose.connect('mongodb://localhost:27017/edumy', {
     useNewUrlParser: true,
@@ -70,6 +71,7 @@ app.use((req, res, next) => {
 app.use('/', userRoutes)
 // app.use('/', participantRoutes)
 app.use('/courses', courseRoutes)
+app.use('/explore', exploreRoutes)
 app.use('/courses/:id/reviews', reviewRoutes)
 
 
