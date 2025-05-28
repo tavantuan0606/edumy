@@ -26,69 +26,7 @@ router.route('/:id')
   .delete(isLoggedIn, catchAsync(courses.deleteCourse))
 
 router.get('/:id/edit', isLoggedIn, isAuthor, catchAsync(courses.renderEditForm))
-router.post('/:courseId/progress', isLoggedIn, async (req, res) => {
-  try {
-    const { courseId } = req.params;
-    const { video, completed } = req.body;
-    const userId = req.user._id;
-
-    // console.log('[✔️ API BODY]', req.body);
-
-    if (!video || typeof video !== 'string') {
-      throw new Error('Thiếu hoặc sai định dạng video URL');
-    }
-
-    const videoLink = video.split('?')[0]; // chuẩn hóa
-    const courseObjectId = new mongoose.Types.ObjectId(courseId);
-
-    let progress = await Progress.findOne({ user: userId, course: courseObjectId });
-    if (!progress) {
-      progress = new Progress({
-        user: userId,
-        course: courseObjectId,
-        completedVideos: []
-      });
-    }
-
-    const alreadyExists = progress.completedVideos.some(v => v.split('?')[0] === videoLink);
-
-    if (completed === true || completed === 'true') {
-      if (!alreadyExists) {
-        progress.completedVideos.push(videoLink);
-      }
-    } else {
-      progress.completedVideos = progress.completedVideos.filter(v => v.split('?')[0] !== videoLink);
-    }
-
-    await progress.save();
-    res.json({ success: true });
-
-  } catch (err) {
-    console.error('[❌ Lỗi khi lưu progress]', err);
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-router.post('/:courseId/notes', isLoggedIn, async (req, res) => {
-  try {
-    const { courseId } = req.params;
-    const { sectionIndex, content } = req.body;
-    const userId = req.user._id;
-
-    let note = await Note.findOne({ user: userId, course: courseId, sectionIndex });
-    if (!note) {
-      note = new Note({ user: userId, course: courseId, sectionIndex, content });
-    } else {
-      note.content = content;
-    }
-
-    await note.save();
-    res.json({ success: true });
-  } catch (err) {
-    console.error('[Lỗi ghi chú]', err);
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
+router.post('/:courseId/progress', isLoggedIn, catchAsync(courses.updateProgress));
+router.post('/:courseId/notes', isLoggedIn, catchAsync(courses.saveNote));
 
 module.exports = router;

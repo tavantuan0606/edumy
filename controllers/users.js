@@ -12,7 +12,7 @@ module.exports.register = async (req, res) => {
         const registeredUser = await User.register(user, password);
         req.login(registeredUser, err => {
             if (err) return next(err);
-            req.flash('success', 'Welcome to the marathon tournament');
+            req.flash('success', 'Welcome to the edumy!');
             res.redirect('./courses')
         })
     } catch (e) {
