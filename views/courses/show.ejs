@@ -36,7 +36,7 @@
           <textarea class="form-control section-note"
             id="note-section-<%= index %>"
             rows="5"
-            placeholder="Nhập ghi chú cho Section <%= index + 1 %>..."
+            placeholder="Nhập ghi chú cho <%= section.section %>..."
             onblur="saveNote(<%= index %>)"
             style="display:none;"><%= sectionNotes[index] || '' %></textarea>
         <% }) %>
