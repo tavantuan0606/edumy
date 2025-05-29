@@ -18,6 +18,7 @@ const courseRoutes = require('./routes/courses');
 const reviewRoutes = require('./routes/reviews');
 const exploreRoutes = require('./routes/explore');
 const { content } = require('googleapis/build/src/apis/content');
+const mongoStore = require('connect-mongo');
 
 mongoose.connect('mongodb://localhost:27017/edumy', {
     useNewUrlParser: true,
@@ -41,7 +42,19 @@ app.use(express.json());
 
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')))
+
+const store = mongoStore.create({
+    mongoUrl: 'mongodb://localhost:27017/edumy',
+    secret: 'mysceret',
+    touchAfter: 24 * 3600, // time in seconds 
+});
+store.on("error", function (e) {
+    console.log("SESSION STORE ERROR", e);
+}); 
+
 const sessionConfig = {
+    store: store,
+    name: 'session',
     secret: 'mysceret',
     resave: false,
     saveUninitialized: true,
