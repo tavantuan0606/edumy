@@ -3,11 +3,15 @@ const router = express.Router();
 const { isLoggedIn } = require('../middleware');
 const catchAsync = require('../utils/catchAsync');
 const course = require('../controllers/courses');
+const multer = require('multer');
+const { storage } = require('../cloudinary');
+const upload = multer({ storage });
 
 router
   .route('/')
   .get(isLoggedIn, catchAsync(course.index))
-  .post(isLoggedIn, catchAsync(course.createCourse));
+  .post(isLoggedIn, upload.array('image'), catchAsync(course.createCourse));
+
 
 router.get('/new', isLoggedIn, course.renderNewForm);
 

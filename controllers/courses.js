@@ -18,7 +18,7 @@ module.exports.renderNewForm = (req, res) => {
 
 module.exports.createCourse = async (req, res, next) => {
   const course = new Course(req.body.course);
-  course.images = req.files.map(f => ({ url: f.path, filename: f.filename }));
+  course.images = req.files ? req.files.map(f => ({ url: f.path, filename: f.filename })) : [];
   course.author = req.user._id;
 
   const match = course.driveLink.match(/\/folders\/([a-zA-Z0-9_-]+)/);

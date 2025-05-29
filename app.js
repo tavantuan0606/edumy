@@ -71,7 +71,7 @@ const fontSrcUrls = [];
 app.use(
     helmet.contentSecurityPolicy({
         directives: {
-            defaultSrc: [],
+            defaultSrc: ["'self'", "https://drive.google.com/"],
             connectSrc: ["'self'", ...connectSrcUrls],
             scriptSrc: ["'self'", "'unsafe-inline'", ...scriptSrcUrls],
             scriptSrcAttr: ["'self'", "'unsafe-inline'"],
