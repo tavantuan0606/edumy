@@ -4,31 +4,29 @@ const { cloudinary } = require('../cloudinary');
 const Progress = require('../models/progress');
 const Note = require('../models/note');
 const User = require('../models/user');
+const mongoose = require('mongoose');
 
 module.exports.index = async (req, res) => {
   const user = await User.findById(req.user._id).populate('enrolledCourses');
   const courses = user.enrolledCourses || [];
   res.render('courses/index', { courses });
-}
+};
 
 module.exports.renderNewForm = (req, res) => {
   res.render('courses/new');
-}
+};
 
 module.exports.createCourse = async (req, res, next) => {
   const course = new Course(req.body.course);
   course.images = req.files.map(f => ({ url: f.path, filename: f.filename }));
   course.author = req.user._id;
 
-  // ✅ Trích xuất folderId từ driveLink
-  const driveLink = course.driveLink;
-  const match = driveLink.match(/\/folders\/([a-zA-Z0-9_-]+)/);
+  const match = course.driveLink.match(/\/folders\/([a-zA-Z0-9_-]+)/);
   if (match) {
     const folderId = match[1];
     try {
       const structure = await scanDriveStructure(folderId);
-      course.driveStructure = structure;
-      course.driveStructure.reverse();
+      course.driveStructure = structure.reverse();
     } catch (err) {
       console.error("Lỗi khi quét Google Drive:", err.message);
       req.flash('error', 'Không thể quét nội dung Drive. Vui lòng kiểm tra link!');
@@ -49,89 +47,69 @@ module.exports.showCourses = async (req, res) => {
 
   let completedVideos = [];
   if (req.user) {
-    try {
-      const progress = await Progress.findOne({
-        user: req.user._id,
-        course: course._id
-      });
-
-      if (progress && Array.isArray(progress.completedVideos)) {
-        completedVideos = progress.completedVideos;
-      }
-    } catch (err) {
-      console.error('[Lỗi khi load progress]:', err.message);
-    }
+    const progress = await Progress.findOne({ user: req.user._id, course: course._id });
+    if (progress?.completedVideos) completedVideos = progress.completedVideos;
   }
+
   const notes = await Note.find({ user: req.user?._id, course: course._id });
   const sectionNotes = Array(course.driveStructure.length).fill('');
   notes.forEach(n => {
     sectionNotes[n.sectionIndex] = n.content;
   });
+
   res.render('courses/show', { course, completedVideos, sectionNotes });
 };
 
-
 module.exports.renderEditForm = async (req, res) => {
-  const { id } = req.params;
-  const course = await Course.findById(id)
+  const course = await Course.findById(req.params.id);
   if (!course) {
     req.flash('error', 'Cannot find that course!');
     return res.redirect('/courses');
   }
-
   res.render('courses/edit', { course });
-}
+};
 
 module.exports.updateCourse = async (req, res) => {
-  const { id } = req.params;
+  const course = await Course.findByIdAndUpdate(req.params.id, req.body.course);
   const imgs = req.files.map(f => ({ url: f.path, filename: f.filename }));
   course.images.push(...imgs);
-  await course.save()
-  req.flash('success', 'Successfully updated course!')
-  res.redirect(`/courses/${course._id}`)
-}
+  await course.save();
+  req.flash('success', 'Successfully updated course!');
+  res.redirect(`/courses/${course._id}`);
+};
 
 module.exports.deleteCourse = async (req, res) => {
-  const { id } = req.params;
-  await Course.findByIdAndDelete(id);
-  req.flash('success', 'Successfully deleted course!')
+  await Course.findByIdAndDelete(req.params.id);
+  req.flash('success', 'Successfully deleted course!');
   res.redirect('/courses');
-}
+};
+
 module.exports.updateProgress = async (req, res) => {
   try {
     const { courseId } = req.params;
     const { video, completed } = req.body;
     const userId = req.user._id;
 
-    if (!video || typeof video !== 'string') {
-      throw new Error('Thiếu hoặc sai định dạng video URL');
-    }
+    if (!video || typeof video !== 'string') throw new Error('Thiếu hoặc sai định dạng video URL');
 
     const videoLink = video.split('?')[0];
     const courseObjectId = new mongoose.Types.ObjectId(courseId);
 
     let progress = await Progress.findOne({ user: userId, course: courseObjectId });
     if (!progress) {
-      progress = new Progress({
-        user: userId,
-        course: courseObjectId,
-        completedVideos: []
-      });
+      progress = new Progress({ user: userId, course: courseObjectId, completedVideos: [] });
     }
 
     const alreadyExists = progress.completedVideos.some(v => v.split('?')[0] === videoLink);
 
     if (completed === true || completed === 'true') {
-      if (!alreadyExists) {
-        progress.completedVideos.push(videoLink);
-      }
+      if (!alreadyExists) progress.completedVideos.push(videoLink);
     } else {
       progress.completedVideos = progress.completedVideos.filter(v => v.split('?')[0] !== videoLink);
     }
 
     await progress.save();
     res.json({ success: true });
-
   } catch (err) {
     console.error('[❌ Lỗi khi lưu progress]', err);
     res.status(500).json({ success: false, error: err.message });

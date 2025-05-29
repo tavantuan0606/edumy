@@ -1,32 +1,25 @@
 const express = require('express');
 const router = express.Router();
-const courses = require('../controllers/courses');
+const { isLoggedIn } = require('../middleware');
 const catchAsync = require('../utils/catchAsync');
-const { isLoggedIn, isAuthor, validateCourse } = require('../middleware')
-const multer = require('multer');
-const { storage } = require('../cloudinary/index');
-const upload = multer({ storage });
-const Progress = require('../models/progress');
-const mongoose = require('mongoose');
-const Note = require('../models/note');
+const course = require('../controllers/courses');
 
-router.route('/')
-  .get(isLoggedIn, catchAsync(courses.index))
-  .post(isLoggedIn, upload.array('image'), validateCourse, catchAsync(courses.createCourse))
-// .post(upload.array('image'), (req, res) => {
-//     console.log(req.body, req.files);
-//     res.send("Work");
-// })
+router
+  .route('/')
+  .get(isLoggedIn, catchAsync(course.index))
+  .post(isLoggedIn, catchAsync(course.createCourse));
 
-router.get('/new', isLoggedIn, courses.renderNewForm)
+router.get('/new', isLoggedIn, course.renderNewForm);
 
-router.route('/:id')
-  .get(isLoggedIn, catchAsync(courses.showCourses))
-  .put(isLoggedIn, isAuthor, upload.array('image'), validateCourse, catchAsync(courses.updateCourse))
-  .delete(isLoggedIn, catchAsync(courses.deleteCourse))
+router
+  .route('/:id')
+  .get(isLoggedIn, catchAsync(course.showCourses))
+  .put(isLoggedIn, catchAsync(course.updateCourse))
+  .delete(isLoggedIn, catchAsync(course.deleteCourse));
 
-router.get('/:id/edit', isLoggedIn, isAuthor, catchAsync(courses.renderEditForm))
-router.post('/:courseId/progress', isLoggedIn, catchAsync(courses.updateProgress));
-router.post('/:courseId/notes', isLoggedIn, catchAsync(courses.saveNote));
+router.get('/:id/edit', isLoggedIn, catchAsync(course.renderEditForm));
+
+router.post('/:courseId/progress', isLoggedIn, catchAsync(course.updateProgress));
+router.post('/:courseId/notes', isLoggedIn, catchAsync(course.saveNote));
 
 module.exports = router;

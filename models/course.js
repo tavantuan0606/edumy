@@ -18,6 +18,11 @@ const CourseSchema = new Schema({
         type: Array,
         default: []
     },
+    topic: {
+        type: String,
+        enum: ['Software', 'Hardware', 'AI', 'Network', 'Language', 'Security', 'Other'],
+        required: true
+    },
     author: {
         type: Schema.Types.ObjectId,
         ref: 'User'

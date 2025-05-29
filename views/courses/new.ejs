@@ -1,37 +1,49 @@
 <% layout('/layouts/boilerplate')%>
-<div class="row">
-    <h1 class="text-center">New Course</h1>
+    <div class="row">
+        <h1 class="text-center">New Course</h1>
         <div class="col-6 offset-3">
             <form action="/courses" method="POST" novalidate class="validated-form" enctype="multipart/form-data">
-                <div class = "mb-3">
-                    <label class = "form-label" for="title">Title</label>
-                    <input class = "form-control" type="text" id="title" name="course[title]" required>
+                <div class="mb-3">
+                    <label class="form-label" for="title">Title</label>
+                    <input class="form-control" type="text" id="title" name="course[title]" required>
                     <div class="valid-feedback">
                         Valid!
                     </div>
                 </div>
-                <div class = "mb-3">
-                    <label class = "form-label" for="driveLink">Drive Link</label>
-                    <input class = "form-control" type="text" id="driveLink" name="course[driveLink]" required>
+                <div class="mb-3">
+                    <label class="form-label" for="driveLink">Drive Link</label>
+                    <input class="form-control" type="text" id="driveLink" name="course[driveLink]" required>
                     <div class="valid-feedback">
                         Valid!
                     </div>
                 </div>
+                <label for="topic">Chủ đề:</label>
+                <select name="course[topic]" class="form-control" required>
+                    <option>Software</option>
+                    <option>Hardware</option>
+                    <option>AI</option>
+                    <option>Network</option>
+                    <option>Language</option>
+                    <option>Security</option>
+                    <option>Other</option>
+                </select>
+
                 <div class="mb-3">
                     <label for="formFile" class="form-label">Add Image</label>
                     <input class="form-control" type="file" id="formFile" name="image" multiple>
-                  </div>
+                </div>
                 <div class="mb-3">
-                    <label class = "form-label" for="description">Description</label>
-                    <textarea class = "form-control" type="text" id="description" name="course[description]" required></textarea>
+                    <label class="form-label" for="description">Description</label>
+                    <textarea class="form-control" type="text" id="description" name="course[description]"
+                        required></textarea>
                     <div class="valid-feedback">
                         Valid!
                     </div>
                 </div>
                 <div class="mb-3">
-                    <button href="/courses" class = "btn btn-info">Create Course</button>
-                </div>  
+                    <button href="/courses" class="btn btn-info">Create Course</button>
+                </div>
             </form>
         </div>
-    </h1>
-</div>
+        </h1>
+    </div>

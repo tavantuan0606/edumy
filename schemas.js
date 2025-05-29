@@ -5,7 +5,8 @@ module.exports.courseSchema = Joi.object({
         title: Joi.string().required(),
         driveLink: Joi.string().required(),
         description: Joi.string().required(),
-        // image: Joi.string().required()
+        // image: Joi.string().required(),
+        topic: Joi.string().valid('Software', 'Hardware', 'AI', 'Network', 'Language', 'Security', 'Other').required(),
     }).required()
 });
 

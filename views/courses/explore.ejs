@@ -1,20 +1,52 @@
 <% layout('/layouts/boilerplate') %>
-    <h3 class="mb-4">Khám phá khóa học</h3>
-    <div class="row">
-        <% unjoinedCourses.forEach(course=> { %>
-            <div class="col-md-4">
-                <div class="card mb-3 shadow-sm">
-                    <img src="<%= course.images[0]?.url || '/default.png' %>" class="card-img-top" alt="Course image">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <%= course.title %>
-                        </h5>
-                        <p class="card-text">
-                            <%= course.description.slice(0, 100) %>...
-                        </p>
-                        <a href="/explore/<%= course._id %>/preview" class="btn btn-primary">Xem chi tiết</a>
+    <div class="mb-5">
+        <div class="position-relative text-white text-center"
+            style="background-image: url('/images/picture.png'); background-size: cover; background-position: center; height: 280px;">
+            <div class="position-absolute top-0 start-0 w-100 h-100" style="background-color: rgba(0,0,0,0.5);"></div>
+            <div class="position-relative py-5">
+                <h1 class="display-5 fw-bold">Khám phá Thế giới Tri thức</h1>
+                <p class="lead">Hàng chục khóa học thuộc nhiều chủ đề khác nhau: Công nghệ, AI, Ngôn ngữ, và hơn thế
+                    nữa.</p>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="mb-4">Danh mục khóa học</h3>
+
+    <% for (let topic in groupedCourses) { %>
+        <h4 class="mt-4">
+            <%= topic %>
+        </h4>
+        <div class="row">
+            <% groupedCourses[topic].forEach(course=> { %>
+                <div class="col-md-4">
+                    <div class="card mb-3 shadow-sm">
+                        <img src="<%= course.images[0]?.url || '/default.png' %>" class="card-img-top"
+                            alt="Course image">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <%= course.title %>
+                            </h5>
+                            <p class="card-text">
+                                <%= course.description.slice(0, 100) %>...
+                            </p>
+                            <% if (course.totalReviews> 0) { %>
+                                <p class="mb-1 text-warning fw-semibold">
+                                    <%= course.avgRating %>
+                                        <% for (let i=1; i <=5; i++) { %>
+                                            <% if (i <=Math.floor(course.avgRating)) { %>★<% } else { %>☆<% } %>
+                                                        <% } %>
+                                                            <span class="text-muted small">(<%= course.totalReviews %>
+                                                                    )</span>
+                                </p>
+                                <% } else { %>
+                                    <p class="text-muted small fst-italic">Chưa có đánh giá</p>
+                                    <% } %>
+                                        <a href="/explore/<%= course._id %>/preview" class="btn btn-primary">Xem chi
+                                            tiết</a>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <% }) %>
-    </div>
+                <% }) %>
+        </div>
+        <% } %>
